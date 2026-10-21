@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.idea/
+.ipynb_checkpoints/
+models/*.pb
+*.mp3
+*.wav
+ 

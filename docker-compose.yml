@@ -1,0 +1,27 @@
+services:
+  api:
+    build: .
+    container_name: audio-genredetector-api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - qdrant
+    environment:
+      - QDRANT_HOST=qdrant
+      - QDRANT_PORT=6333
+      - QDRANT_COLLECTION=tracks_embeddings
+      - OFFLINE_MODE=true      # per usare i modelli già copiati in /app/models
+    volumes:
+      - ./models:/app/models   # così riusi i modelli della macchina host
+      - ./static:/app/static
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
+volumes:
+  qdrant_storage:
