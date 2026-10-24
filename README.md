@@ -14,7 +14,7 @@ Upload an MP3/WAV track and the service will:
 2. transform it into a **vector** that describes its stylistic profile;
 3. save it in **Qdrant** and find the **most similar tracks** in the catalog.
 
-This project was developed as a Master's in Data Analytics thesis.
+Originally developed as my Master's thesis project in Data Analytics.
 
 ![Dashboard](docs/dashboard.png)
 
@@ -35,11 +35,20 @@ flowchart LR
 
 **How it works:**
 
-- **Audio analysis**: two pre-trained [Essentia](https://essentia.upf.edu/models.html) models. The first (EffNet) extracts embeddings from the signal, the second computes the probability of the track for each of the 400 genres.
+- **Audio analysis**: two pre-trained [Essentia](https://essentia.upf.edu/models.html) models. The first (EffNet) extracts embeddings from the signal, the second estimates the track's probability for each of the 400 genres.
 - **Genre vector**: out of the 400 values, only the top 10 are kept; the rest are zeroed out. The vector remains interpretable (each dimension is a genre) and less noisy.
 - **Search**: vectors are stored in Qdrant and compared using cosine similarity.
 - **Interfaces**: REST API with Swagger, web dashboard, and command-line client.
 - **Deploy**: Docker Compose (API + Qdrant). Works offline too, once the models are downloaded.
+
+---
+
+## 🧭 Design decisions
+
+- **Pre-trained models instead of training from scratch**: Essentia's Discogs models are trained on millions of tracks, far beyond what a custom dataset could offer. The work is in integrating them reliably, not retraining them.
+- **Top-10 sparse vector**: keeping only the strongest genres removes low-probability noise and keeps every dimension interpretable, which makes similarity results explainable.
+- **Qdrant + cosine similarity**: purpose-built vector search with payload storage, easy to run locally and to scale later.
+- **Offline-first Docker deployment**: once the models are downloaded, the whole stack runs without internet access, which suits environments with network or privacy constraints.
 
 ---
 
@@ -79,7 +88,7 @@ Once running, the following services are available:
 | Qdrant       | http://localhost:6333/dashboard          |
 
 <details>
-<summary>Run without Docker</summary>
+<summary>Run the API without Docker</summary>
 
 ```bash
 pip install -r requirements.txt
@@ -87,7 +96,7 @@ docker run -p 6333:6333 qdrant/qdrant
 uvicorn server:app --reload --port 8000
 ```
 
-Note: `essentia-tensorflow` is only available for Linux and macOS. On Windows, use Docker.
+Note: `essentia-tensorflow` wheels are published for Linux only. On Windows and macOS, use Docker.
 </details>
 
 ---

@@ -1,248 +1,141 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Music Genre Embeddings Dashboard</title>
-  <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f5f5f5;
-    }
-    header {
-      background: #222;
-      color: #fff;
-      padding: 16px 24px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 1.4rem;
-    }
-    main {
-      padding: 16px 24px;
-    }
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.1rem;
-    }
-    label {
-      display: block;
-      margin: 8px 0 4px;
-      font-size: 0.9rem;
-    }
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 0.9rem;
-    }
-    input[type="file"] {
-      margin-top: 4px;
-    }
-    button {
-      margin-top: 8px;
-      padding: 6px 12px;
-      border-radius: 4px;
-      border: none;
-      background: #007bff;
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .col {
-      flex: 1 1 320px;
-    }
-    pre {
-      background: #111;
-      color: #eee;
-      padding: 8px 10px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      overflow-x: auto;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.85rem;
-    }
-    table th, table td {
-      border: 1px solid #ddd;
-      padding: 4px 6px;
-      text-align: left;
-    }
-    table th {
-      background: #f0f0f0;
-    }
-    .status {
-      font-size: 0.8rem;
-      margin-top: 4px;
-      color: #555;
-    }
-    .section-title {
-      font-size: 1.05rem;
-      font-weight: 600;
-      margin: 16px 0 8px;
-    }
-    .small {
-      font-size: 0.8rem;
-      color: #777;
-    }
-
-    details.json-details {
-  margin-top: 4px;
-}
-
-    details.json-details summary {
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #007bff;
-  margin-bottom: 4px;
-}
-
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Analyze music genres with AI-powered embeddings and find similar tracks using vector search." />
+  <title>SoundDNA — AI Music Genre Intelligence</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+
   <header>
-    <h1>🎵 Music Genre Embeddings Dashboard (FastAPI + Qdrant)</h1>
+    <h1>🧬 SoundDNA</h1>
+    <p>AI-powered music genre analysis &amp; similarity search</p>
   </header>
 
   <main>
     <div class="container">
 
-      <div class="card">
-        <h2>⚙️ Configurazione</h2>
-        <label for="apiBaseUrl">API Base URL</label>
-        <input id="apiBaseUrl" type="text" value="http://127.0.0.1:8000" />
-        <div class="small">
-          Modifica questo campo se l'API gira su un host/porta diversi.
-        </div>
+      <!-- Config bar -->
+      <div class="config-bar">
+        <label for="apiBaseUrl">⚡ API Endpoint</label>
+        <input id="apiBaseUrl" type="text" value="http://127.0.0.1:8000"
+               placeholder="http://127.0.0.1:8000" />
       </div>
 
-      <div class="row">
+      <!-- Row 1: Analyze + Index -->
+      <div class="row two-cols">
 
         <!-- ANALYZE -->
-        <div class="col">
-          <div class="card">
-            <h2>🎧 Analyze (/analyze)</h2>
-            <label for="analyzeFile">File audio (MP3/WAV)</label>
+        <div class="card">
+          <h2><span class="icon">🎧</span> Analyze Track</h2>
+
+          <div class="file-drop" id="analyzeDrop">
             <input id="analyzeFile" type="file" accept=".mp3,.wav" />
-            <button onclick="analyzeTrack()">Analizza</button>
-            <div id="analyzeStatus" class="status"></div>
-
-            <div class="section-title">Top Generi</div>
-            <div id="analyzeTopGenres"></div>
-
-            <div class="section-title">Risposta JSON</div>
-
-            <details class="json-details" open>
-              <summary>Mostra / Nascondi risposta</summary>
-            <pre id="analyzeOutput"></pre>
-            </details>
-
-
-
+            <div class="drop-icon">🎵</div>
+            <div class="drop-text">Drop audio here or <span>browse</span></div>
           </div>
+          <div class="file-name" id="analyzeFileName"></div>
+
+          <button class="btn btn-primary" onclick="analyzeTrack()">Analyze</button>
+          <div id="analyzeStatus" class="status"></div>
+
+          <div class="section-title">Top Genres</div>
+          <div id="analyzeTopGenres"></div>
+
+          <div class="section-title">JSON Response</div>
+          <details class="json-details">
+            <summary>Show / Hide response</summary>
+            <pre id="analyzeOutput"></pre>
+          </details>
         </div>
 
         <!-- INDEX -->
-        <div class="col">
-          <div class="card">
-            <h2>📥 Index (/index)</h2>
-            <label for="indexFile">File audio (MP3/WAV)</label>
+        <div class="card">
+          <h2><span class="icon">📥</span> Index Track</h2>
+
+          <div class="file-drop" id="indexDrop">
             <input id="indexFile" type="file" accept=".mp3,.wav" />
-            <label for="indexTrackId">Track ID (opzionale)</label>
-            <input id="indexTrackId" type="text" placeholder="Se vuoto, verrà generato un UUID" />
-            <button onclick="indexTrack()">Indicizza</button>
-            <div id="indexStatus" class="status"></div>
-
-            <div class="section-title">Risposta JSON</div>
-
-            <details class="json-details" open>
-              <summary>Mostra / Nascondi risposta</summary>
-              <pre id="indexOutput"></pre>
-            </details>
-
-
+            <div class="drop-icon">💾</div>
+            <div class="drop-text">Drop audio here or <span>browse</span></div>
           </div>
+          <div class="file-name" id="indexFileName"></div>
+
+          <div class="field">
+            <label for="indexTrackId">Track ID (optional)</label>
+            <input id="indexTrackId" type="text" placeholder="Leave empty for auto-generated UUID" />
+          </div>
+
+          <button class="btn btn-primary" onclick="indexTrack()">Index</button>
+          <div id="indexStatus" class="status"></div>
+
+          <div class="section-title">JSON Response</div>
+          <details class="json-details">
+            <summary>Show / Hide response</summary>
+            <pre id="indexOutput"></pre>
+          </details>
         </div>
 
       </div>
 
-      <div class="row">
+      <!-- Row 2: Similar + Debug -->
+      <div class="row two-cols">
 
         <!-- SIMILAR -->
-        <div class="col">
-          <div class="card">
-            <h2>🔎 Similar (/similar)</h2>
-            <label for="similarFile">Brano di query (MP3/WAV)</label>
+        <div class="card">
+          <h2><span class="icon">🔍</span> Find Similar</h2>
+
+          <div class="file-drop" id="similarDrop">
             <input id="similarFile" type="file" accept=".mp3,.wav" />
-            <label for="similarLimit">Numero massimo risultati</label>
-            <input id="similarLimit" type="number" min="1" max="50" value="10" />
-            <button onclick="similarTracks()">Cerca simili</button>
-            <div id="similarStatus" class="status"></div>
-
-            <div class="section-title">Top generi brano di query</div>
-            <pre id="similarTopGenres"></pre>
-
-            <div class="section-title">Tracce simili</div>
-            <div id="similarTable"></div>
-
-            <div class="section-title">Risposta JSON</div>
-
-            <details class="json-details" open>
-              <summary>Mostra / Nascondi risposta</summary>
-              <pre id="similarOutput"></pre>
-            </details>
-
-
+            <div class="drop-icon">🔎</div>
+            <div class="drop-text">Drop query track or <span>browse</span></div>
           </div>
+          <div class="file-name" id="similarFileName"></div>
+
+          <div class="field">
+            <label for="similarLimit">Max results</label>
+            <input id="similarLimit" type="number" min="1" max="50" value="10" />
+          </div>
+
+          <button class="btn btn-primary" onclick="similarTracks()">Search</button>
+          <div id="similarStatus" class="status"></div>
+
+          <div class="section-title">Query Track Genres</div>
+          <pre id="similarTopGenres"></pre>
+
+          <div class="section-title">Similar Tracks</div>
+          <div id="similarTable"></div>
+
+          <div class="section-title">JSON Response</div>
+          <details class="json-details">
+            <summary>Show / Hide response</summary>
+            <pre id="similarOutput"></pre>
+          </details>
         </div>
 
         <!-- DEBUG -->
-        <div class="col">
-          <div class="card">
-            <h2>🧪 Debug (/debug/{track_id})</h2>
+        <div class="card">
+          <h2><span class="icon">🧪</span> Debug Point</h2>
+
+          <div class="field">
             <label for="debugTrackId">Track ID</label>
-            <input id="debugTrackId" type="text" placeholder="Inserisci un track_id salvato" />
-            <label>
-              <input id="debugWithVector" type="checkbox" />
-              Includi vettore completo
-            </label>
-            <button onclick="debugTrack()">Recupera</button>
-            <div id="debugStatus" class="status"></div>
-
-            <div class="section-title">Risultato debug</div>
-
-            <details class="json-details" open>
-                <summary>Mostra / Nascondi risposta</summary>
-                <pre id="debugOutput"></pre>
-            </details>
-
-
-
+            <input id="debugTrackId" type="text" placeholder="Enter a stored track ID" />
           </div>
+
+          <label class="checkbox-wrap">
+            <input id="debugWithVector" type="checkbox" />
+            Include full vector
+          </label>
+
+          <button class="btn btn-primary" onclick="debugTrack()">Fetch</button>
+          <div id="debugStatus" class="status"></div>
+
+          <div class="section-title">Debug Result</div>
+          <details class="json-details" open>
+            <summary>Show / Hide response</summary>
+            <pre id="debugOutput"></pre>
+          </details>
         </div>
 
       </div>
@@ -250,243 +143,178 @@
     </div>
   </main>
 
- <script>
-  // Se vuoi, potresti usare il campo di configurazione:
-  // function getApiBaseUrl() {
-  //   const el = document.getElementById("apiBaseUrl");
-  //   return el.value.trim().replace(/\/+$/, "");
-  // }
+<script>
+  /* ── Helpers ── */
+  function getApiBaseUrl() { return ""; }
 
-  // Per ora usiamo sempre la stessa origin (se apri da FastAPI):
-  function getApiBaseUrl() {
-    return "";
-  }
-
-  // Pretty-print JSON se è JSON, altrimenti mostra testo grezzo
   function setJson(elId, dataOrText) {
     const el = document.getElementById(elId);
-
-    if (dataOrText == null) {
-      el.textContent = "";
-      return;
-    }
-
+    if (dataOrText == null) { el.textContent = ""; return; }
     if (typeof dataOrText === "string") {
-      // provo a interpretarlo come JSON
-      try {
-        const obj = JSON.parse(dataOrText);
-        el.textContent = JSON.stringify(obj, null, 2);
-      } catch (e) {
-        // non è JSON, mostro il testo così com'è (HTML, errore, ecc.)
-        el.textContent = dataOrText;
-      }
+      try { el.textContent = JSON.stringify(JSON.parse(dataOrText), null, 2); }
+      catch { el.textContent = dataOrText; }
     } else {
       el.textContent = JSON.stringify(dataOrText, null, 2);
     }
   }
 
-  // Tabella top_genres
+  function setStatus(id, text, type) {
+    const el = document.getElementById(id);
+    el.className = "status " + (type || "");
+    el.innerHTML = (type === "loading" ? '<span class="spinner"></span>' : "") + text;
+  }
+
+  /* ── Genre table ── */
   function renderTopGenresTable(containerId, topGenres) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
-
     if (!topGenres || Object.keys(topGenres).length === 0) {
-      container.textContent = "(nessun dato)";
+      container.textContent = "(no data)";
       return;
     }
-
     const entries = Object.entries(topGenres).sort((a, b) => b[1] - a[1]);
-
-    let html = '<table><thead><tr><th>Genere</th><th>Score</th></tr></thead><tbody>';
+    let html = '<table><thead><tr><th>Genre</th><th>Score</th></tr></thead><tbody>';
     for (const [genre, score] of entries) {
-      html += `<tr><td>${genre}</td><td>${score}</td></tr>`;
+      const pct = (score * 100).toFixed(1);
+      html += `<tr><td>${genre}</td><td><div style="display:flex;align-items:center;gap:8px;">
+        <div style="flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#7c3aed,#2dd4bf);border-radius:3px;"></div>
+        </div>
+        <span style="min-width:44px;text-align:right;font-variant-numeric:tabular-nums;">${score.toFixed(4)}</span>
+      </div></td></tr>`;
     }
     html += "</tbody></table>";
     container.innerHTML = html;
   }
 
-  // ANALYZE
+  /* ── File drop zones ── */
+  document.querySelectorAll(".file-drop").forEach(drop => {
+    const input = drop.querySelector('input[type="file"]');
+    const nameEl = drop.parentElement.querySelector(".file-name");
+
+    input.addEventListener("change", () => {
+      if (input.files.length) nameEl.textContent = "📄 " + input.files[0].name;
+      else nameEl.textContent = "";
+    });
+
+    drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("dragover"); });
+    drop.addEventListener("dragleave", () => drop.classList.remove("dragover"));
+    drop.addEventListener("drop", e => {
+      e.preventDefault();
+      drop.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        input.files = e.dataTransfer.files;
+        nameEl.textContent = "📄 " + e.dataTransfer.files[0].name;
+      }
+    });
+  });
+
+  /* ── ANALYZE ── */
   async function analyzeTrack() {
     const fileInput = document.getElementById("analyzeFile");
-    const statusEl = document.getElementById("analyzeStatus");
-    const apiBase = getApiBaseUrl();
+    if (!fileInput.files.length) { setStatus("analyzeStatus", "Please select an audio file.", "error"); return; }
 
-    if (!fileInput.files.length) {
-      statusEl.textContent = "Seleziona un file audio.";
-      return;
-    }
-
-    const file = fileInput.files[0];
     const formData = new FormData();
-    formData.append("file", file);
-
-    statusEl.textContent = "Chiamata a /analyze in corso...";
+    formData.append("file", fileInput.files[0]);
+    setStatus("analyzeStatus", "Analyzing…", "loading");
 
     try {
-      const resp = await fetch(`${apiBase}/analyze`, {
-        method: "POST",
-        body: formData,
-      });
-
+      const resp = await fetch(`${getApiBaseUrl()}/analyze`, { method: "POST", body: formData });
       const text = await resp.text();
-      statusEl.textContent = `Status: ${resp.status}`;
+      setStatus("analyzeStatus", `Status: ${resp.status}`, resp.ok ? "success" : "error");
       setJson("analyzeOutput", text);
-
-      // Provo a estrarre top_genres se è JSON
       try {
         const data = JSON.parse(text);
         renderTopGenresTable("analyzeTopGenres", data.top_genres || {});
-      } catch (e) {
-        // non è JSON, quindi non provo a usare top_genres
-      }
-    } catch (err) {
-      statusEl.textContent = `Errore: ${err}`;
-    }
+      } catch {}
+    } catch (err) { setStatus("analyzeStatus", `Error: ${err}`, "error"); }
   }
 
-  // INDEX
+  /* ── INDEX ── */
   async function indexTrack() {
     const fileInput = document.getElementById("indexFile");
-    const trackIdInput = document.getElementById("indexTrackId");
-    const statusEl = document.getElementById("indexStatus");
-    const apiBase = getApiBaseUrl();
+    if (!fileInput.files.length) { setStatus("indexStatus", "Please select an audio file.", "error"); return; }
 
-    if (!fileInput.files.length) {
-      statusEl.textContent = "Seleziona un file audio.";
-      return;
-    }
-
-    const file = fileInput.files[0];
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileInput.files[0]);
 
     const params = new URLSearchParams();
-    if (trackIdInput.value.trim() !== "") {
-      params.set("track_id", trackIdInput.value.trim());
-    }
+    const tid = document.getElementById("indexTrackId").value.trim();
+    if (tid) params.set("track_id", tid);
 
-    let url = `${apiBase}/index`;
-    if ([...params.keys()].length > 0) {
-      url += `?${params.toString()}`;
-    }
+    let url = `${getApiBaseUrl()}/index`;
+    if ([...params.keys()].length > 0) url += `?${params}`;
 
-    statusEl.textContent = "Chiamata a /index in corso...";
+    setStatus("indexStatus", "Indexing…", "loading");
 
     try {
-      const resp = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
+      const resp = await fetch(url, { method: "POST", body: formData });
       const text = await resp.text();
-      statusEl.textContent = `Status: ${resp.status}`;
+      setStatus("indexStatus", `Status: ${resp.status}`, resp.ok ? "success" : "error");
       setJson("indexOutput", text);
-    } catch (err) {
-      statusEl.textContent = `Errore: ${err}`;
-    }
+    } catch (err) { setStatus("indexStatus", `Error: ${err}`, "error"); }
   }
 
-  // SIMILAR
+  /* ── SIMILAR ── */
   async function similarTracks() {
     const fileInput = document.getElementById("similarFile");
-    const limitInput = document.getElementById("similarLimit");
-    const statusEl = document.getElementById("similarStatus");
-    const apiBase = getApiBaseUrl();
+    if (!fileInput.files.length) { setStatus("similarStatus", "Please select an audio file.", "error"); return; }
 
-    if (!fileInput.files.length) {
-      statusEl.textContent = "Seleziona un file audio.";
-      return;
-    }
-
-    const file = fileInput.files[0];
     const formData = new FormData();
-    formData.append("file", file);
+    formData.append("file", fileInput.files[0]);
 
     const params = new URLSearchParams();
-    params.set("limit", limitInput.value || "10");
+    params.set("limit", document.getElementById("similarLimit").value || "10");
 
-    const url = `${apiBase}/similar?${params.toString()}`;
-
-    statusEl.textContent = "Chiamata a /similar in corso...";
+    setStatus("similarStatus", "Searching…", "loading");
 
     try {
-      const resp = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
+      const resp = await fetch(`${getApiBaseUrl()}/similar?${params}`, { method: "POST", body: formData });
       const text = await resp.text();
-      statusEl.textContent = `Status: ${resp.status}`;
+      setStatus("similarStatus", `Status: ${resp.status}`, resp.ok ? "success" : "error");
       setJson("similarOutput", text);
 
-      // Se è JSON, mostro tabella risultati
       try {
         const data = JSON.parse(text);
         setJson("similarTopGenres", data.top_genres || {});
 
         const similar = data.similar_tracks || [];
         const container = document.getElementById("similarTable");
+        if (!similar.length) { container.innerHTML = "(no results)"; return; }
 
-        if (!similar.length) {
-          container.innerHTML = "(nessun risultato)";
-          return;
-        }
-
-        let html =
-          "<table><thead><tr><th>ID</th><th>Score</th><th>Filename</th></tr></thead><tbody>";
+        let html = "<table><thead><tr><th>ID</th><th>Score</th><th>Filename</th></tr></thead><tbody>";
         for (const item of similar) {
           html += `<tr>
-            <td>${item.id ?? ""}</td>
-            <td>${
-              item.score?.toFixed ? item.score.toFixed(4) : item.score ?? ""
-            }</td>
+            <td style="font-family:monospace;font-size:0.78rem;">${item.id ?? ""}</td>
+            <td>${item.score?.toFixed ? item.score.toFixed(4) : item.score ?? ""}</td>
             <td>${item.filename ?? ""}</td>
           </tr>`;
         }
         html += "</tbody></table>";
         container.innerHTML = html;
-      } catch (e) {
-        // non era JSON: lascio solo il testo grezzo
-      }
-    } catch (err) {
-      statusEl.textContent = `Errore: ${err}`;
-    }
+      } catch {}
+    } catch (err) { setStatus("similarStatus", `Error: ${err}`, "error"); }
   }
 
-  // DEBUG
+  /* ── DEBUG ── */
   async function debugTrack() {
-    const trackIdInput = document.getElementById("debugTrackId");
-    const withVectorInput = document.getElementById("debugWithVector");
-    const statusEl = document.getElementById("debugStatus");
-    const apiBase = getApiBaseUrl();
+    const trackId = document.getElementById("debugTrackId").value.trim();
+    if (!trackId) { setStatus("debugStatus", "Please enter a track ID.", "error"); return; }
 
-    const trackId = trackIdInput.value.trim();
-    if (!trackId) {
-      statusEl.textContent = "Inserisci un track_id.";
-      return;
-    }
+    const withVector = document.getElementById("debugWithVector").checked;
+    const params = new URLSearchParams({ with_vector: withVector });
+    const url = `${getApiBaseUrl()}/debug/${encodeURIComponent(trackId)}?${params}`;
 
-    const params = new URLSearchParams();
-    params.set("with_vector", withVectorInput.checked ? "true" : "false");
-
-    const url = `${apiBase}/debug/${encodeURIComponent(
-      trackId
-    )}?${params.toString()}`;
-
-    statusEl.textContent = "Chiamata a /debug in corso...";
+    setStatus("debugStatus", "Fetching…", "loading");
 
     try {
       const resp = await fetch(url, { method: "GET" });
       const text = await resp.text();
-      statusEl.textContent = `Status: ${resp.status}`;
+      setStatus("debugStatus", `Status: ${resp.status}`, resp.ok ? "success" : "error");
       setJson("debugOutput", text);
-    } catch (err) {
-      statusEl.textContent = `Errore: ${err}`;
-    }
+    } catch (err) { setStatus("debugStatus", `Error: ${err}`, "error"); }
   }
 </script>
-
-
 
 </body>
 </html>
