@@ -2,6 +2,8 @@
 
 A music similarity search engine: from audio to a vector database, exposed via API and containerized.
 
+> **Note:** This is version 1.0 (audio pipeline). A newer version with a natural-language chat layer is in development on the `dev` branch.
+
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)
 ![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-orange)
@@ -54,7 +56,7 @@ flowchart LR
 
 ## 🎧 Example result
 
-Given *Smoke on the Water* (Deep Purple) as input, the main genres are **Blues Rock**, **Hard Rock**, and **Classic Rock**. The most similar track in the catalog is *Free Bird* (Lynyrd Skynyrd).
+Given *September* (Earth, Wind & Fire) as query input (a track not present in the catalog), the top recommendation in the catalog is *Superstition* (Stevie Wonder) with a similarity score of **0.77**, while the second result drops to **0.21**, reflecting the clear funk/soul stylistic affinity.
 
 ![Similar tracks](docs/similar.png)
 
@@ -66,12 +68,13 @@ The notebook [`EDA_qdrant.ipynb`](EDA_qdrant.ipynb) contains the exploratory ana
 
 ### 1. Download the models
 
+Before building the Docker image, download the Essentia pre-trained models into the `models/` directory:
+
 ```bash
-pip install requests
 python download_models.py
 ```
 
-Files are saved in `models/`.
+*(Requires `requests`: `pip install requests`)*
 
 ### 2. Start with Docker Compose
 
@@ -115,13 +118,19 @@ Note: `essentia-tensorflow` wheels are published for Linux only. On Windows and 
 
 ```json
 {
-  "filename": "Comfortably Numb.mp3",
+  "filename": "September.mp3",
   "similar_tracks": [
     {
-      "id": "track123",
-      "score": 0.92,
-      "filename": "Free Bird.mp3",
-      "top_genres": { "Rock---Hard Rock": 23.5, "Rock---Classic Rock": 21.8 }
+      "id": "track_001",
+      "score": 0.77,
+      "filename": "Superstition.mp3",
+      "top_genres": { "Funk / Soul---Funk": 34.2, "Funk / Soul---Soul": 28.1 }
+    },
+    {
+      "id": "track_002",
+      "score": 0.21,
+      "filename": "Another Track.mp3",
+      "top_genres": { "Rock---Hard Rock": 22.0 }
     }
   ]
 }
@@ -132,7 +141,7 @@ Note: `essentia-tensorflow` wheels are published for Linux only. On Windows and 
 
 ```bash
 python client.py analyze song.mp3
-python client.py index song.mp3 --track-id rock_0001
+python client.py index song.mp3
 python client.py similar song.mp3
 ```
 
@@ -147,6 +156,7 @@ python client.py similar song.mp3
 ├── static/index.html    # Web dashboard
 ├── EDA_qdrant.ipynb     # Exploratory analysis of the vectors
 ├── docs/                # Diagrams and screenshots
+├── requirements.txt     # Python dependencies
 ├── Dockerfile
 └── docker-compose.yml
 ```
