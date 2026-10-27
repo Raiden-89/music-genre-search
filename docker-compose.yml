@@ -9,9 +9,9 @@ services:
       - QDRANT_HOST=qdrant
       - QDRANT_PORT=6333
       - QDRANT_COLLECTION=tracks_embeddings
-      - OFFLINE_MODE=true      # per usare i modelli già copiati in /app/models
+      - OFFLINE_MODE=true      # to use models already copied into /app/models
     volumes:
-      - ./models:/app/models   # così riusi i modelli della macchina host
+      - ./models:/app/models   # to reuse models from the host machine
       - ./static:/app/static
 
   qdrant:

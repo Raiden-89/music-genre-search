@@ -17,11 +17,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Dipendenze Python
+# Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# codice + modelli
+# Code and models
 COPY server.py .
 COPY models ./models
 
