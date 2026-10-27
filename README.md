@@ -62,7 +62,7 @@ Given *September* (Earth, Wind & Fire) as query input (a track not present in th
 
 Given *Love of My Life* (Queen), also not in the catalog, the closest tracks are *Notte prima degli esami* (Antonello Venditti, 0.747), *Heart of Gold* (Neil Young, 0.666) and *Angie* (The Rolling Stones, 0.651): different artists, languages and decades, all slow, melodic songs. The vectors capture the character of a track, not just its label.
 
-![Similar tracks: ballad](docs/similar-ballad.png.png)
+![Similar tracks: ballad](docs/similar-ballad.png)
 
 ---
 
