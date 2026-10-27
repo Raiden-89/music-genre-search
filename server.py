@@ -109,16 +109,30 @@ else:
 # -------------------------------------------------
 # Load the list of classes (genre names)
 # -------------------------------------------------
-classes = []
-if os.path.exists(meta_path):
+METADATA_ERROR_MSG = "metadata.json not found: run python download_models.py"
+
+def get_classes():
+    """
+    Returns the list of genre classes from metadata.json.
+    Raises HTTPException(503) if metadata.json is missing or does not contain 'classes'.
+    """
+    if not os.path.exists(meta_path):
+        raise HTTPException(status_code=503, detail=METADATA_ERROR_MSG)
     try:
         with open(meta_path, "r", encoding="utf-8") as f:
             meta = json.load(f)
-            classes = meta.get("classes", [])
-    except Exception as e:
-        print(f"Cannot read metadata.json: {e}")
-else:
-    print("[WARN] metadata.json not found, classes will be empty.")
+    except Exception:
+        raise HTTPException(status_code=503, detail=METADATA_ERROR_MSG)
+    cls = meta.get("classes")
+    if not cls or not isinstance(cls, list):
+        raise HTTPException(status_code=503, detail=METADATA_ERROR_MSG)
+    return cls
+
+classes = []
+try:
+    classes = get_classes()
+except HTTPException:
+    print(f"[ERROR] {METADATA_ERROR_MSG}")
 
 num_classes = None  # will be determined at first inference
 
@@ -240,7 +254,7 @@ def process_audio_file(temp_filename: str):
     return embeddings, avg_activations
 
 
-def build_genre_vector_and_topk(avg_activations: np.ndarray):
+def build_genre_vector_and_topk(avg_activations: np.ndarray, genre_classes: Optional[list] = None):
     """
     Given the average activation vector [num_classes],
     builds:
@@ -262,11 +276,14 @@ def build_genre_vector_and_topk(avg_activations: np.ndarray):
     # Copy scores for top-K only
     dense_vector[top_indices] = avg_activations[top_indices]
 
+    if genre_classes is None:
+        genre_classes = get_classes()
+
     # Build the top-K genre dict
     results = {}
     for i in top_indices:
-        if i < len(classes):
-            genre_name = classes[i]
+        if i < len(genre_classes):
+            genre_name = genre_classes[i]
         else:
             genre_name = f"genre_{i}"
         # Not normalizing to sum 1; score * 100 as per original logic
@@ -287,6 +304,8 @@ async def analyze_genre(file: UploadFile = File(...)):
       only the 10 genres with the highest magnitude are non-zero; the rest are 0.
     Does NOT save anything to Qdrant, only returns the result.
     """
+    genre_classes = get_classes()
+
     ext = os.path.splitext(file.filename or "")[1] or ".mp3"
     temp_filename = os.path.join(tempfile.gettempdir(), f"{uuid.uuid4().hex}{ext}")
 
@@ -299,7 +318,7 @@ async def analyze_genre(file: UploadFile = File(...)):
         _, avg_activations = process_audio_file(temp_filename)
 
         # Build genre vector + top-K
-        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations)
+        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations, genre_classes)
 
         return {
             "filename": file.filename,
@@ -307,6 +326,8 @@ async def analyze_genre(file: UploadFile = File(...)):
             "genre_vector": genre_vector.tolist(),  # optional, useful for debug/analysis
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"INTERNAL ERROR /analyze: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -329,6 +350,8 @@ async def index_track(
     - dense 400D vector (num_classes) with only the top-10 genres non-zero.
     - payload with filename and top_genres.
     """
+    genre_classes = get_classes()
+
     if qdrant_client is None:
         return {"error": "Qdrant not available; cannot index tracks."}
 
@@ -344,7 +367,7 @@ async def index_track(
         _, avg_activations = process_audio_file(temp_filename)
 
         # Build genre vector + top-K
-        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations)
+        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations, genre_classes)
 
         vector_size = int(genre_vector.shape[0])
         ensure_collection(vector_size)
@@ -374,6 +397,8 @@ async def index_track(
             "message": "Track successfully indexed in Qdrant.",
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"INTERNAL ERROR /index: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
@@ -394,6 +419,8 @@ async def similar_tracks(file: UploadFile = File(...), limit: int = 10):
     - the 'limit' most similar tracks already stored in Qdrant
       (similarity computed on the dense 400D genre vector with top-10 non-zero).
     """
+    genre_classes = get_classes()
+
     if embedding_model is None or genre_model is None:
         return {"error": "Essentia/TensorFlow models not initialized."}
 
@@ -412,7 +439,7 @@ async def similar_tracks(file: UploadFile = File(...), limit: int = 10):
         _, avg_activations = process_audio_file(temp_filename)
 
         # Build the genre vector for the query
-        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations)
+        genre_vector, top_genres = build_genre_vector_and_topk(avg_activations, genre_classes)
 
         vector_size = int(genre_vector.shape[0])
         ensure_collection(vector_size)
@@ -445,6 +472,8 @@ async def similar_tracks(file: UploadFile = File(...), limit: int = 10):
             "similar_tracks": similar,
         }
 
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"INTERNAL ERROR /similar: {e}")
         raise HTTPException(status_code=500, detail=str(e))
