@@ -54,11 +54,15 @@ flowchart LR
 
 ---
 
-## 🎧 Example result
+## 🎧 Example results
 
 Given *September* (Earth, Wind & Fire) as query input (a track not present in the catalog), the top recommendation in the catalog is *Superstition* (Stevie Wonder) with a similarity score of **0.77**, while the second result drops to **0.21**, reflecting the clear funk/soul stylistic affinity.
 
 ![Similar tracks](docs/similar.png)
+
+Given *Love of My Life* (Queen), also not in the catalog, the closest tracks are *Notte prima degli esami* (Antonello Venditti, 0.747), *Heart of Gold* (Neil Young, 0.666) and *Angie* (The Rolling Stones, 0.651): different artists, languages and decades, all slow, melodic songs. The vectors capture the character of a track, not just its label.
+
+![Similar tracks: ballad](docs/similar-ballad.png.png)
 
 ---
 
