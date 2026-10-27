@@ -132,7 +132,7 @@ classes = []
 try:
     classes = get_classes()
 except HTTPException:
-    print(f"[ERROR] {METADATA_ERROR_MSG}")
+    print(f"[ERROR] {METADATA_ERROR_MSG}", flush=True)
 
 num_classes = None  # will be determined at first inference
 
