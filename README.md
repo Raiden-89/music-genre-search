@@ -123,16 +123,20 @@ Note: `essentia-tensorflow` wheels are published for Linux only. On Windows and 
   "filename": "September.mp3",
   "similar_tracks": [
     {
-      "id": "track_001",
-      "score": 0.77,
-      "filename": "Superstition.mp3",
-      "top_genres": { "Funk / Soul---Funk": 34.2, "Funk / Soul---Soul": 28.1 }
+      "id": "e4b2d187-5c8e-4a69-a83d-3cf34d8a1c92",
+      "score": 0.7661,
+      "filename": "Stevie Wonder-Superstition.mp3",
+      "top_genres": {
+        "Funk / Soul---Funk": 19.19,
+        "Rock---Pop Rock": 14.7,
+        "Funk / Soul---Disco": 12.11,
+        "Funk / Soul---Soul": 11.97
+      }
     },
     {
-      "id": "track_002",
-      "score": 0.21,
-      "filename": "Another Track.mp3",
-      "top_genres": { "Rock---Hard Rock": 22.0 }
+      "id": "a8f7c9e2-1b34-45d6-8a7e-9012345678ab",
+      "score": 0.2149,
+      "filename": "Queen - Don't Stop Me Now.mp3"
     }
   ]
 }
