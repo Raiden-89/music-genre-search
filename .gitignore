@@ -7,4 +7,5 @@ models/*.pb
 models/metadata.json
 *.mp3
 *.wav
+docs/innovazione_architetturale.md
 AGENT_NOTES.md
