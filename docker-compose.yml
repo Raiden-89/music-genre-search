@@ -1,7 +1,6 @@
 services:
   api:
     build: .
-    container_name: audio-genredetector-api
     ports:
       - "8000:8000"
     depends_on:
@@ -17,7 +16,6 @@ services:
 
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: qdrant
     ports:
       - "6333:6333"
     volumes:

@@ -17,16 +17,9 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# librerie Python (aggiunto qdrant-client)
-RUN pip install --no-cache-dir \
-    essentia-tensorflow \
-    fastapi \
-    python-multipart \
-    uvicorn \
-    numpy \
-    requests \
-    wget \
-    qdrant-client
+# Dipendenze Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # codice + modelli
 COPY server.py .

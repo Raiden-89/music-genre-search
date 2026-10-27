@@ -15,16 +15,12 @@ from fastapi.staticfiles import StaticFiles
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
-# -------------------------------------------------
-# Disable SSL warnings (we use verify=False for downloads)
-# -------------------------------------------------
-
 # FastAPI instance
 app = FastAPI(
-    title="Music Genre Embeddings API",
+    title="SoundDNA API",
     description=(
-        "API to analyze MP3 tracks, extract genre distributions "
-        "and save genre embeddings (400D, top-10 non-zero) to Qdrant."
+        "SoundDNA: Analyze audio tracks, extract 400D Essentia "
+        "genre distributions (top-10 non-zero) and search similar tracks in Qdrant."
     ),
 )
 
@@ -80,7 +76,7 @@ def download_file(url: str, destination: str):
 
     print(f"Downloading {url} -> {destination} ...")
     try:
-        r = requests.get(url, stream=True, verify=False, timeout=60)
+        r = requests.get(url, stream=True, timeout=60)
         r.raise_for_status()
         with open(destination, "wb") as f:
             for chunk in r.iter_content(1024):
