@@ -60,8 +60,6 @@ Given *September* (Earth, Wind & Fire) as query input (a track not present in th
 
 ![Similar tracks](docs/similar.png)
 
-The notebook [`EDA_qdrant.ipynb`](EDA_qdrant.ipynb) contains the exploratory analysis of the saved vectors, with PCA and t-SNE projections: tracks cluster by genre family (rock, electronic, jazz, classical).
-
 ---
 
 ## 🚀 Quick start
@@ -154,7 +152,6 @@ python client.py similar song.mp3
 ├── client.py            # CLI client
 ├── download_models.py   # Downloads Essentia models into models/
 ├── static/index.html    # Web dashboard
-├── EDA_qdrant.ipynb     # Exploratory analysis of the vectors
 ├── docs/                # Diagrams and screenshots
 ├── requirements.txt     # Python dependencies
 ├── Dockerfile
