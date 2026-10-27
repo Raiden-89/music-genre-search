@@ -1,6 +1,6 @@
-# 🎵 Music Genre Embeddings API
+# SoundDNA
 
-**A music similarity search engine: from audio to a vector database, exposed via API and containerized.**
+A music similarity search engine: from audio to a vector database, exposed via API and containerized.
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green)

@@ -17,10 +17,10 @@ from qdrant_client.models import Distance, VectorParams, PointStruct
 
 # FastAPI instance
 app = FastAPI(
-    title="Music Genre Embeddings API",
+    title="SoundDNA API",
     description=(
-        "API to analyze MP3 tracks, extract genre distributions "
-        "and save genre embeddings (400D, top-10 non-zero) to Qdrant."
+        "SoundDNA: Analyze audio tracks, extract 400D Essentia "
+        "genre distributions (top-10 non-zero) and search similar tracks in Qdrant."
     ),
 )
 
