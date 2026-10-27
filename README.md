@@ -170,7 +170,7 @@ python client.py similar song.mp3
 
 ## ⚠️ Limitations
 
-- This is a prototype: tested on a catalog of ~20 tracks with qualitative evaluation only.
+- This is a prototype: tested on a personal catalog of about 140 tracks, with qualitative evaluation only.
 - Models are pre-trained and used as-is, without fine-tuning.
 - The vector describes genre only. Tempo, mood, and instrumentation are not considered.
 
